@@ -1,36 +1,16 @@
-link = 0
-right = 0
+import math as m, re
 
-numbers = { 1 : 'one', 
-            2 : 'two',
-            3 : 'three', 
-            4 : 'four',
-            5 : 'five',
-            6 : 'six',
-            7 : 'seven', 
-            8 : 'eight',
-            9 : 'nine'}
+board = list(open('input3'))
+chars = {(r, c): [] for r in range(140) for c in range(140)
+                    if board[r][c] not in '01234566789.'}
 
-with open("input1") as file:
-    for line in file.readlines():
-        for links in line:
-            try:
-                link += (int(links) * 10)
-                break
-            except Exception as e:
-                continue
+for r, row in enumerate(board):
+    for n in re.finditer(r'\d+', row):
+        edge = {(r, c) for r in (r-1, r, r+1)
+                       for c in range(n.start()-1, n.end()+1)}
 
-        for ri in reversed(line):
-            try:
-                right += int(ri)
-                break  # Stop after finding the first integer from the end
-            except Exception as e:
-                continue
+        for o in edge & chars.keys():
+            chars[o].append(int(n.group()))
 
-total = right + link
-
-
-print(**numbers)
-    
-
-print(total)
+print(sum(sum(p)    for p in chars.values()),
+      sum(m.prod(p) for p in chars.values() if len(p)==2))
