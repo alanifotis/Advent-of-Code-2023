@@ -19,6 +19,7 @@ public class DayFive {
         long[] locations = Arrays.stream(file.get(0).split("\\D+"))
             .filter(s -> !s.isBlank())
             .map(Long::parseLong)
+            .parallel()
             .mapToLong(seed -> FromSeedToLocation(seed))
             .toArray();
 
