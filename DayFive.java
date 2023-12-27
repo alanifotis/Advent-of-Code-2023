@@ -18,14 +18,30 @@ public class DayFive {
         fileLength = file.size();
         long[] locations = Arrays.stream(file.get(0).split("\\D+"))
             .filter(s -> !s.isBlank())
-            .map(Long::parseLong)
-            .parallel()
-            .mapToLong(seed -> FromSeedToLocation(seed))
-            .toArray();
+            .mapToLong(Long::parseLong).toArray();
+            //.map(e -> LongStream.range(e, e+1))
+            //.parallel()
+            //.mapToLong(seed -> FromSeedToLocation(seed))
+            
+        long lowest = Long.MAX_VALUE;
 
-        Arrays.sort(locations);
+       
+        for (int i = 0; i < locations.length - 1; i += 2) {
+            long start = locations[i];
+            long end = locations[i + 1];
 
-        System.out.println("Part 1: " + locations[0]);
+            long[] temp = LongStream.range(start, start + end)
+                .parallel()
+                .map(DayFive::FromSeedToLocation)
+                .toArray();
+            Arrays.sort(temp);
+
+            lowest = temp[0] > lowest ? lowest : temp[0]; 
+        }
+        //Arrays.sort(locations);
+        //Arrays.sort(part2);
+
+        System.out.println("Part 1: " + lowest);
 
     }
 
@@ -56,8 +72,10 @@ public class DayFive {
                     seed = destinationStart + ( seed - sourceStart);
                     while (some) {
                         i++;
-                        String[] nextLine = file.get(i).split("\\D+");
-                        if (i >= fileLength - 1 || nextLine.length < 2) {
+                        
+                        String[] nextLine = i <= fileLength - 1 ? file.get(i).split("\\D+") : "".split("\\D+");
+                        
+                        if (i >= fileLength || nextLine.length < 2) {
                             some = false;
                             break;
                         }
